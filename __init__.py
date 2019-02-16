@@ -1,5 +1,5 @@
 """
-skill fairytalez
+skill Andersen's Fairy Tales
 Copyright (C) 2018  Andreas Lorensen
 
 This program is free software: you can redistribute it and/or modify
@@ -24,23 +24,31 @@ from bs4 import BeautifulSoup
 import time
 
 
-class Fairytalez(MycroftSkill):
+class AndersensTales(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
 
     def initialize(self):
         self.is_reading = False
+        self.lang_url = {'da': 'https://www.andersenstories.com/da/andersen_fortaellinger/',
+                         'en': 'https://www.andersenstories.com/en/andersen_fairy-tales/',
+                         'de': 'https://www.andersenstories.com/de/andersen_maerchen/',
+                         'es': 'https://www.andersenstories.com/es/andersen_cuentos/',
+                         'fr': 'https://www.andersenstories.com/fr/andersen_contes/',
+                         'it': 'https://www.andersenstories.com/it/andersen_fiabe/',
+                         'nl': 'https://www.andersenstories.com/nl/andersen_sprookjes/'}
+        self.url = self.lang_url[self.lang[:2]]
 
-    @intent_file_handler('fairytalez.intent')
-    def handle_fairytalez(self, message):
+    @intent_file_handler('AndersensTales.intent')
+    def handle_AndersensTales(self, message):
         if message.data.get("tale") is None:
-            response = self.get_response('fairytalez', num_retries=0)
+            response = self.get_response('AndersensTales', num_retries=0)
             if response is None:
                 return
         else:
             response = message.data.get("tale")
-        self.speak_dialog('let_me_think', data={"story": response})
-        index = self.get_index("https://fairytalez.com/fairy-tales/")
+        index = self.get_index(self.url + "list")
+        self.log.info(index)
         result = match_one(response, list(index.keys()))
 
         if result[1] < 0.8:
@@ -50,7 +58,6 @@ class Fairytalez(MycroftSkill):
                 self.speak_dialog('no_story')
                 return
         self.speak_dialog('i_know_that', data={"story": result[0]})
-        # self.log.info(result + " " + result[0])
         self.settings['story'] = result[0]
         time.sleep(3)
         self.tell_story(index.get(result[0]), 0)
@@ -62,18 +69,17 @@ class Fairytalez(MycroftSkill):
         else:
             story = self.settings.get('story')
             self.speak_dialog('continue', data={"story": story})
-            index = self.get_index("https://fairytalez.com/fairy-tales/")
+            index = self.get_index(self.url + "list")
             self.tell_story(index.get(story), self.settings.get('bookmark') - 1)
 
     def tell_story(self, url, bookmark):
         self.is_reading = True
-        self.settings['bookmark'] = bookmark
-        if bookmark is 0:
-            title = self.get_title(url)
-            author = self.get_author(url)
-            self.speak_dialog('title_by_author', data={'title': title, 'author': author})
-            time.sleep(1)
-        lines = self.get_story(url)
+        title = self.get_title(url)
+        subtitle = self.get_subtitle(url)
+        self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle})
+        time.sleep(1)
+        self.log.info(url)
+        lines = self.get_story(url).split('\n\n')
         for line in lines[bookmark:]:
             self.settings['bookmark'] += 1
             time.sleep(.5)
@@ -91,7 +97,7 @@ class Fairytalez(MycroftSkill):
             self.settings['bookmark'] = 0
             self.settings['story'] = None
             time.sleep(2)
-            self.speak_dialog('from_fairytalez')
+            self.speak_dialog('from_AndersensTales')
 
     def stop(self):
         self.log.info('stop is called')
@@ -103,33 +109,37 @@ class Fairytalez(MycroftSkill):
 
     def get_soup(self, url):
         try:
-            return BeautifulSoup(requests.get(url).text, "html.parser")
+            r = requests.get(url)
+            r.encoding = r.apparent_encoding
+            soup = BeautifulSoup(r.text, "html.parser")
+            return soup
         except Exception as SockException:
             self.log.error(SockException)
 
     def get_story(self, url):
         soup = self.get_soup(url)
-        lines = [a.text.strip() for a in soup.find(id="main").find_all("p")[1:]]
-        lines = [l for l in lines if not l.startswith("{") and not l.endswith("}")]
+        lines = [a.text.strip() for a in soup.find_all('div', {'class': ['text']})][0]
         return lines
 
     def get_title(self, url):
         soup = self.get_soup(url)
-        title = [a.text.strip() for a in soup.findAll("h1")][0]
+        title = [a.text.strip() for a in soup.findAll("h1", {'itemprop': ['name']})][0]
+        genre = [a.text.strip() for a in soup.findAll("span", {'itemprop': ['genre']})][0]
+        title = title.replace(genre, '')
         return title
 
-    def get_author(self, url):
+    def get_subtitle(self, url):
         soup = self.get_soup(url)
-        author = [a.text.strip() for a in soup.findAll("div", {"class": "author-name"})][0]
-        return str(author).split("  ")[0]
+        subtitle = [a.text.strip() for a in soup.find_all('span', {'itemprop': ['headline']})][0]
+        return subtitle
 
     def get_index(self, url):
         soup = self.get_soup(url)
         index = {}
-        for link in soup.find(id="main").find_all('a'):
-            index.update({link.text[2:]: link.get("href")})
+        for link in soup.find_all("a"):
+            index.update({link.text: self.url + link.get("href")})
         return index
 
 
 def create_skill():
-    return Fairytalez()
+    return AndersensTales()
