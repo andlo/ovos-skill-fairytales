@@ -1,2 +1,7 @@
-Ik het verhaal ([{story}]) vertellen.
-Ik herinner mij het verhaal ([{story}])
+# This file is auto translated by mycroft-msk. 
+# Please do a manuel inspection of the translation 
+ 
+# I can tell the story {story}.
+Ik kan het verhaal {verhaal} vertellen.  
+# I remember the {story}.
+Ik herinner me het {verhaal}.  

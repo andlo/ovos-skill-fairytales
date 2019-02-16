@@ -137,7 +137,8 @@ class AndersensTales(MycroftSkill):
         soup = self.get_soup(url)
         index = {}
         for link in soup.find_all("a"):
-            index.update({link.text: self.url + link.get("href")})
+            if "http" not in link.get("href"):
+                index.update({link.text: self.url + link.get("href")})
         return index
 
 

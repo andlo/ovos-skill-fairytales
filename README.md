@@ -14,13 +14,13 @@ Albert Einstein_
 
 ## Examples
 * "Tell a H. C. Andersen storie"
-* "Tell me the story The Little Match Girl"
-* "Continue story"
+* "Tell me the H. C. Andersen story The Little Match Girl"
+* "Continue H. C. Andersen story"
 
 Mycroft will then try to find the fairy tale if you told wich one you wanted. If not, he will ask you.
 
 ## Credits
-Andreas Lorensen (@andlo) and the super comunity around Mycroft
+Andreas Lorensen (@andlo)
 
 ## Category
 **Entertainment**
@@ -33,3 +33,5 @@ Andreas Lorensen (@andlo) and the super comunity around Mycroft
 #fairy
 #fairytale
 #fairytales
+#andersen
+#hca

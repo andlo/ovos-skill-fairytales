@@ -1,2 +1,7 @@
-Posso raccontare la storia {story}.
-Ricordo la {story}.
+# This file is auto translated by mycroft-msk. 
+# Please do a manuel inspection of the translation 
+ 
+# I can tell the story {story}.
+Posso raccontare la storia {story}.  
+# I remember the {story}.
+Ricordo la {storia}.  
