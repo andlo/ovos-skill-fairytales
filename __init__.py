@@ -30,6 +30,7 @@ class AndersensTales(MycroftSkill):
 
     def initialize(self):
         self.is_reading = False
+        # make sure settings are initialized
         self.settings['bookmark'] = 0
         self.settings['story'] = None
         self.lang_url = {'da': 'https://www.andersenstories.com/da/andersen_fortaellinger/',
