@@ -75,8 +75,7 @@ class Tales(OVOSSkill):
         self.is_reading = True
         title = self.get_title(url)
         subtitle = self.get_subtitle(url)
-        self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle})
-        time.sleep(1)
+        self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle}, waite=True)
         self.log.info(url)
         lines = self.get_story(url).split('\n\n')
         for line in lines[bookmark:]:
