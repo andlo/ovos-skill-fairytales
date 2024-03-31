@@ -57,20 +57,20 @@ class Tales(OVOSSkill):
             if not response or response is 'no':
                 self.speak_dialog('no_story')
                 return
-        self.speak_dialog('i_know_that', data={"story": result[0]})
-        self.settings['story'] = result[0]
-        time.sleep(3)
-        self.tell_story(self.index[result[0]], 0)
+#        self.speak_dialog('i_know_that', data={"story": result[0]})
+#        self.settings['story'] = result[0]
+#        time.sleep(3)
+        #self.tell_story(self.index[result[0]], 0)
 
-    @intent_handler('continue.intent')
-    def handle_continue(self, message: Message):
-        if self.settings.get('story') is None:
-            self.speak_dialog('no_story_to_continue')
-        else:
-            story = self.settings.get('story')
-            self.speak_dialog('continue', data={"story": story})
-            index = self.get_index(self.url_andersen + "list")
-            self.tell_story(index.get(story), self.settings.get('bookmark') - 1)
+#    @intent_handler('continue.intent')
+#    def handle_continue(self, message: Message):
+#        if self.settings.get('story') is None:
+#            self.speak_dialog('no_story_to_continue')
+#        else:
+#            story = self.settings.get('story')
+#           self.speak_dialog('continue', data={"story": story})
+#            index = self.get_index(self.url_andersen + "list")
+#            self.tell_story(index.get(story), self.settings.get('bookmark') - 1)
 
     def tell_story(self, url, bookmark):
         self.is_reading = True
@@ -152,9 +152,7 @@ class Tales(OVOSSkill):
                      'en': 'https://www.grimmstories.com/en/grimm_fairy-tales/',
                      'de': 'https://www.grimmstories.com/de/grimm_maerchen/',
                      'es': 'https://www.grimmstories.com/es/grimm_cuentos/',
-                     'fr': 'https://www.grimmstories.com/fr/grimm_contes/',
-                     'it': 'https://www.grimmstories.com/it/grimm_fiabe/',
-                     'nl': 'https://www.grimmstories.com/nl/grimm_sprookjes/'}
+                     'fr': 'https://www.grimmstories.com/fr/grimm_contes/'}
         self.index = {}
         self.index.update(self.get_index(url_andersen["en"] + "list"))
         self.index.update(self.get_index(url_grimm[self.lang["en"] + "list"))

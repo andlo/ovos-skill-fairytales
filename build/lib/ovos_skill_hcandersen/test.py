@@ -61,8 +61,7 @@ def get_index(url):
     return index
 
 url = 'https://www.andersenstories.com/da/andersen_fortaellinger/list'
-index = {}
-index.update(get_index("https://www.andersenstories.com/da/andersen_fortaellinger/list")) 
+index = get_index("https://www.andersenstories.com/da/andersen_fortaellinger/list") 
 index.update(get_index("https://www.grimmstories.com/en/grimm_fairy-tales/list"))
 
 print(index)

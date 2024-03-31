@@ -1,0 +1,2 @@
+[ovos.plugin.skill]
+ovos-skill-hcandersen.andlo = ovos_skill_hcandersen:Tales
