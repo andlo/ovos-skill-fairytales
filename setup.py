@@ -3,9 +3,9 @@ from setuptools import setup
 from os import walk, path
 
 BASEDIR = path.abspath(path.dirname(__file__))
-URL = "https://github.com/andlo/ovos-skill-hcandersen"
+URL = "https://github.com/andlo/ovos-skill-fairytales"
 SKILL_CLAZZ = "Tales"  # needs to match __init__.py class name
-PYPI_NAME = "ovos-skill-hcandersen"  # pip install PYPI_NAME
+PYPI_NAME = "ovos-skill-fairytales"  # pip install PYPI_NAME
 
 # below derived from github url to ensure standard skill_id
 SKILL_AUTHOR, SKILL_NAME = URL.split(".com/")[-1].split("/")
