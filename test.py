@@ -60,9 +60,33 @@ def get_index(url):
         index.update({link.text: link.get("href")})
     return index
 
-url = 'https://www.andersenstories.com/da/andersen_fortaellinger/list'
-index = {}
-index.update(get_index("https://www.andersenstories.com/da/andersen_fortaellinger/list")) 
-index.update(get_index("https://www.grimmstories.com/en/grimm_fairy-tales/list"))
+#url = 'https://www.andersenstories.com/da/andersen_fortaellinger/list'
+#index = {}
+#index.update(get_index("https://www.andersenstories.com/da/andersen_fortaellinger/list")) 
+#index.update(get_index("https://www.grimmstories.com/en/grimm_fairy-tales/list"))
+
+url = 'https://fairytalez.com/fairy-tales/'
+r = requests.get(url)
+r.encoding = r.apparent_encoding
+soup = BeautifulSoup(r.text, "html.parser")
+
+#lines = [a.text.strip() for a in soup.find_all("div", {'itemprop': ['text']})][0]
+#lines = [a.text.strip() for a in soup.find_all("div", {'id': ['azindex-1']})[0]
+#lines = soup.find("div", {"id": ["wrapper"], "class": ["box-story"]})
+#lines = soup.find_all("div", {"id": ["main"]})
+lines = soup.find_all()
+ 
+#.findAll("a")
+print(lines)
+
+#title = [a.text.strip() for a in soup.find_all("h2", {'itemprop': ['name']})][0]
+#print(title)
+
+#genre = [a.text.strip() for a in soup.find_all("span", {'itemprop': ['genre']})][0]
+#print(genre)
+
+#title = title.replace(genre, '')
+#ondertitle = [a.text.strip() for a in soup.find_all("div", {'class': ['subtitle']})][0]
+#print(ondertitle)
 
 print(index)

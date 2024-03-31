@@ -69,8 +69,7 @@ class Tales(OVOSSkill):
         else:
             story = self.settings.get('story')
             self.speak_dialog('continue', data={"story": story})
-            index = self.get_index(self.url_andersen + "list")
-            self.tell_story(index.get(story), self.settings.get('bookmark') - 1)
+            self.tell_story(self.index.get(story), self.settings.get('bookmark') - 1)
 
     def tell_story(self, url, bookmark):
         self.is_reading = True
@@ -84,10 +83,12 @@ class Tales(OVOSSkill):
             self.settings['bookmark'] += 1
             time.sleep(.5)
             if self.is_reading is False:
+                lines = []
                 break
             sentenses = line.split('. ')
             for sentens in sentenses:
                 if self.is_reading is False:
+                    sentens = ""
                     break
                 else:
                     self.speak(sentens, wait=True)
