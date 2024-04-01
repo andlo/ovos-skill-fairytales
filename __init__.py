@@ -1,5 +1,5 @@
 """
-skill HC Andersen's Fairy Tales
+skill OVOS Fairy tales
 Copyright (C) 2024  Andreas Lorensen
 
 This program is free software: you can redistribute it and/or modify
