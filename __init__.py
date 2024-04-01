@@ -75,14 +75,12 @@ class Tales(OVOSSkill):
         self.is_reading = True
         title = self.get_title(url)
         subtitle = self.get_subtitle(url)
-        self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle}, waite=True)
+        self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle}, wait=True)
         self.log.info(url)
         lines = self.get_story(url).split('\n\n')
         for line in lines[bookmark:]:
             self.settings['bookmark'] += 1
-            time.sleep(.5)
             if self.is_reading is False:
-                lines = []
                 break
             sentenses = line.split('. ')
             for sentens in sentenses:
@@ -90,7 +88,8 @@ class Tales(OVOSSkill):
                     sentens = ""
                     break
                 else:
-                    self.speak(sentens, wait=True)
+                    self.speak_dialog(sentens, wait=True)
+                    time.sleep(1)
         if self.is_reading is True:
             self.is_reading = False
             self.settings['bookmark'] = 0
@@ -101,6 +100,8 @@ class Tales(OVOSSkill):
     def stop(self):
         self.log.info('stop is called')
         if self.is_reading is True:
+            self.speak_dialog('stop_telling_tales')
+            self.speak_dialog('from_Tales')
             self.is_reading = False
             return True
         else:
