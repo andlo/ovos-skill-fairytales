@@ -157,6 +157,6 @@ class Tales(OVOSSkill):
                      'it': 'https://www.grimmstories.com/it/grimm_fiabe/',
                      'nl': 'https://www.grimmstories.com/nl/grimm_sprookjes/'}
         self.index = {}
-        self.index.update(self.get_index(url_andersen[(self.lang.split("-")[-2] or "en")] + "list"))
-        self.index.update(self.get_index(url_grimm[(self.lang.split("-")[-2] or "en")] + "list"))
+        self.index.update(self.get_index(url_andersen[(self.lang.split("-")[0] or "en")] + "list"))
+        self.index.update(self.get_index(url_grimm[(self.lang.split("-")[0] or "en")] + "list"))
          
