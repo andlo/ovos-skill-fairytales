@@ -28,6 +28,7 @@ from ovos_utils.process_utils import RuntimeRequirements
 import requests
 from bs4 import BeautifulSoup
 import time
+import json
 
 
 class StoryFetchError(Exception):
@@ -37,20 +38,26 @@ class StoryFetchError(Exception):
 
 class Tales(OVOSSkill):
 
+    # how long a cached story index is considered fresh before we try to
+    # re-scrape it (the story lists rarely change)
+    INDEX_CACHE_TTL = 60 * 60 * 24 * 7  # 7 days
+
     @classproperty
     def runtime_requirements(self):
-        # the story index and every story text are scraped live, so this
-        # skill is useless without internet, both at load time and at
-        # runtime. Once #8/#9 (caching) land, no_internet_fallback can be
-        # set to True so the skill isn't unloaded just because the
-        # connection blips mid-story.
+        # the story index and every story text are scraped live, so we
+        # still want internet before the *first* load. Once loaded, a
+        # cached index (see _refresh_index) and per-session story text
+        # cache (see get_story) let the skill keep working through brief
+        # connectivity blips, so we don't need to be unloaded when
+        # internet drops - failed live fetches are handled gracefully
+        # (StoryFetchError -> 'story_unavailable' dialog) instead.
         return RuntimeRequirements(
             internet_before_load=True,
             network_before_load=True,
             requires_internet=True,
             requires_network=True,
-            no_internet_fallback=False,
-            no_network_fallback=False,
+            no_internet_fallback=True,
+            no_network_fallback=True,
         )
 
     def initialize(self):
@@ -59,13 +66,57 @@ class Tales(OVOSSkill):
         self.settings['bookmark'] = 0
         self.settings['story'] = None
         self.index = {}
+        # in-memory cache of already-fetched story text, keyed by URL, so
+        # 'continue' (and repeat requests for the same story) don't need a
+        # fresh scrape every time
+        self._story_text_cache = {}
+        self.refresh_index()
+
+    def _index_cache_filename(self):
+        lang = self.lang.split("-")[0]
+        return f"index_{lang}.json"
+
+    def _read_index_cache(self):
+        cache_file = self._index_cache_filename()
+        if not self.file_system.exists(cache_file):
+            return None
+        try:
+            with self.file_system.open(cache_file, "r") as f:
+                return json.load(f)
+        except (OSError, ValueError) as e:
+            self.log.warning(f"could not read story index cache: {e}")
+            return None
+
+    def _write_index_cache(self):
+        cache_file = self._index_cache_filename()
+        try:
+            with self.file_system.open(cache_file, "w") as f:
+                json.dump({"timestamp": time.time(), "index": self.index}, f)
+        except OSError as e:
+            self.log.warning(f"could not write story index cache: {e}")
+
+    def refresh_index(self, force=False):
+        """(Re)build self.index.
+
+        Uses a fresh on-disk cache if available, otherwise scrapes live and
+        updates the cache. If scraping fails, falls back to a stale cache
+        (better an old index than none) instead of leaving self.index empty.
+        """
+        cached = self._read_index_cache()
+        if not force and cached and (time.time() - cached.get("timestamp", 0)) < self.INDEX_CACHE_TTL:
+            self.index = cached.get("index", {})
+            return
         try:
             self.update_index()
+            self._write_index_cache()
         except StoryFetchError as e:
             # don't let a scraping failure prevent the skill from loading -
-            # intents will still register, we just won't have stories until
-            # the source sites are reachable again (see #8 for caching)
-            self.log.error(f"Could not build story index on startup: {e}")
+            # intents will still register, and we can fall back to a stale
+            # cache if we have one instead of ending up with no stories
+            self.log.error(f"Could not refresh story index: {e}")
+            if cached:
+                self.log.warning("Falling back to previously cached (possibly stale) story index")
+                self.index = cached.get("index", {})
 
     @intent_handler('Tales.intent')
     def handle_Tales(self, message: Message):
@@ -155,11 +206,15 @@ class Tales(OVOSSkill):
             raise StoryFetchError(f"failed to fetch {url}: {e}") from e
 
     def get_story(self, url):
+        if url in self._story_text_cache:
+            return self._story_text_cache[url]
         soup = self.get_soup(url)
         elements = soup.find_all("div", {'itemprop': ['text']})
         if not elements:
             raise StoryFetchError(f"story text not found at {url}")
-        return elements[0].text.strip()
+        text = elements[0].text.strip()
+        self._story_text_cache[url] = text
+        return text
 
     def get_title(self, url):
         soup = self.get_soup(url)
