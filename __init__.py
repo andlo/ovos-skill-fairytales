@@ -62,9 +62,12 @@ class Tales(OVOSSkill):
 
     def initialize(self):
         self.is_reading = False
-        # make sure settings are initialized
-        self.settings['bookmark'] = 0
-        self.settings['story'] = None
+        # progress is tracked per story title so multiple stories can be
+        # 'in progress' at once without one overwriting another's bookmark
+        # (see #11). Use setdefault (not a hard reset) so progress survives
+        # a skill reload/restart instead of being wiped every time.
+        self.settings.setdefault('progress', {})
+        self.settings.setdefault('last_story', None)
         self.index = {}
         # in-memory cache of already-fetched story text, keyed by URL, so
         # 'continue' (and repeat requests for the same story) don't need a
@@ -137,9 +140,10 @@ class Tales(OVOSSkill):
                 self.speak_dialog('no_story')
                 return
         self.speak_dialog('i_know_that', data={"story": result[0]}, wait=True)
-        self.settings['story'] = result[0]
+        title = result[0]
+        self.settings['last_story'] = title
         try:
-            self.tell_story(self.index[result[0]], 0)
+            self.tell_story(title, 0)
         except StoryFetchError as e:
             self.log.error(f"Could not fetch story: {e}")
             self.is_reading = False
@@ -147,27 +151,32 @@ class Tales(OVOSSkill):
 
     @intent_handler('continue.intent')
     def handle_continue(self, message: Message):
-        if self.settings.get('story') is None:
+        title = self.settings.get('last_story')
+        if title is None:
             self.speak_dialog('no_story_to_continue')
-        else:
-            story = self.settings.get('story')
-            self.speak_dialog('continue', data={"story": story})
-            try:
-                self.tell_story(self.index.get(story), self.settings.get('bookmark') - 1)
-            except StoryFetchError as e:
-                self.log.error(f"Could not fetch story: {e}")
-                self.is_reading = False
-                self.speak_dialog('story_unavailable')
+            return
+        self.speak_dialog('continue', data={"story": title}, wait=True)
+        start = self.settings.get('progress', {}).get(title, 0)
+        try:
+            self.tell_story(title, start)
+        except StoryFetchError as e:
+            self.log.error(f"Could not fetch story: {e}")
+            self.is_reading = False
+            self.speak_dialog('story_unavailable')
 
-    def tell_story(self, url, bookmark):
+    def tell_story(self, story_title, bookmark):
+        entry = self.index.get(story_title)
+        if entry is None:
+            raise StoryFetchError(f"unknown story: {story_title}")
+        url = entry["url"]
         self.is_reading = True
         title = self.get_title(url)
         subtitle = self.get_subtitle(url)
         self.speak_dialog('title_by_author', data={'title': title, 'subtitle': subtitle}, wait=True)
         self.log.info(url)
         lines = self.get_story(url).split('\n\n')
-        for line in lines[bookmark:]:
-            self.settings['bookmark'] += 1
+        for i, line in enumerate(lines[bookmark:], start=bookmark):
+            self.settings['progress'][story_title] = i + 1
             if self.is_reading is False:
                 break
             sentenses = line.split('. ')
@@ -179,8 +188,9 @@ class Tales(OVOSSkill):
                     self.speak_dialog(sentens, wait=True)
         if self.is_reading is True:
             self.is_reading = False
-            self.settings['bookmark'] = 0
-            self.settings['story'] = None
+            self.settings['progress'].pop(story_title, None)
+            if self.settings.get('last_story') == story_title:
+                self.settings['last_story'] = None
             self.speak_dialog('from_Tales')
 
     def stop(self):
@@ -236,8 +246,24 @@ class Tales(OVOSSkill):
             raise StoryFetchError(f"story index not found at {url}")
         index = {}
         for link in lists[0].find_all("a"):
-            index.update({link.text: link.get("href")})
+            index[link.text] = link.get("href")
         return index
+
+    def _merge_index(self, source_index, author_label):
+        """Merge a {title: url} index for one source (Andersen/Grimm) into
+        self.index, storing the author alongside each entry.
+
+        If the same title exists in both collections, don't let the second
+        one silently overwrite the first (see #12) - instead give both
+        entries a disambiguated "title - author" key.
+        """
+        for title, url in source_index.items():
+            entry_title = title
+            if title in self.index and self.index[title]["author"] != author_label:
+                existing = self.index.pop(title)
+                self.index[f"{title} - {existing['author']}"] = existing
+                entry_title = f"{title} - {author_label}"
+            self.index[entry_title] = {"url": url, "author": author_label}
     
     def update_index(self):
         url_andersen = {'da': 'https://www.andersenstories.com/da/andersen_fortaellinger/',
@@ -258,6 +284,6 @@ class Tales(OVOSSkill):
         if lang not in url_andersen:
             lang = "en"
         self.index = {}
-        self.index.update(self.get_index(url_andersen[lang] + "list"))
-        self.index.update(self.get_index(url_grimm[lang] + "list"))
+        self._merge_index(self.get_index(url_andersen[lang] + "list"), "Andersen")
+        self._merge_index(self.get_index(url_grimm[lang] + "list"), "Grimm")
          
