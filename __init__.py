@@ -16,10 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-#from mycroft import MycroftSkill, intent_file_handler
-#from mycroft.util.parse import match_one
-#from mycroft.audio import wait_while_speaking
-
 from ovos_bus_client.message import Message 
 from ovos_workshop.decorators import intent_handler  
 from ovos_workshop.intents import IntentBuilder  
@@ -50,11 +46,10 @@ class Tales(OVOSSkill):
         else:
             response = message.data.get("tale")
         result = match_one(response, list(self.index.keys()))
-        self.speak(result)
         if result[1] < 0.8:
             self.speak_dialog('that_would_be', data={"story": result[0]})
             response = self.ask_yesno('is_it_that')
-            if not response or response is 'no':
+            if not response or response == 'no':
                 self.speak_dialog('no_story')
                 return
         self.speak_dialog('i_know_that', data={"story": result[0]})
@@ -136,8 +131,8 @@ class Tales(OVOSSkill):
     def get_index(self, url):
         soup = self.get_soup(url)
         index = {}
-        list = soup.find_all("ul", {'class': ['list_link']})[0]
-        for link in list.find_all("a"):
+        link_list = soup.find_all("ul", {'class': ['list_link']})[0]
+        for link in link_list.find_all("a"):
             index.update({link.text: link.get("href")})
         return index
     
@@ -156,7 +151,10 @@ class Tales(OVOSSkill):
                      'fr': 'https://www.grimmstories.com/fr/grimm_contes/',
                      'it': 'https://www.grimmstories.com/it/grimm_fiabe/',
                      'nl': 'https://www.grimmstories.com/nl/grimm_sprookjes/'}
+        lang = self.lang.split("-")[0]
+        if lang not in url_andersen:
+            lang = "en"
         self.index = {}
-        self.index.update(self.get_index(url_andersen[(self.lang.split("-")[0] or "en")] + "list"))
-        self.index.update(self.get_index(url_grimm[(self.lang.split("-")[0] or "en")] + "list"))
+        self.index.update(self.get_index(url_andersen[lang] + "list"))
+        self.index.update(self.get_index(url_grimm[lang] + "list"))
          
