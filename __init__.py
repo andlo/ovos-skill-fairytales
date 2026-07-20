@@ -21,6 +21,8 @@ from ovos_workshop.decorators import intent_handler
 from ovos_workshop.intents import IntentBuilder  
 from ovos_workshop.skills import OVOSSkill 
 from ovos_utils.parse import match_one
+from ovos_utils import classproperty
+from ovos_utils.process_utils import RuntimeRequirements
 
 
 import requests
@@ -28,17 +30,48 @@ from bs4 import BeautifulSoup
 import time
 
 
+class StoryFetchError(Exception):
+    """Raised when a story/index page could not be fetched or parsed
+    from andersenstories.com / grimmstories.com."""
+
+
 class Tales(OVOSSkill):
+
+    @classproperty
+    def runtime_requirements(self):
+        # the story index and every story text are scraped live, so this
+        # skill is useless without internet, both at load time and at
+        # runtime. Once #8/#9 (caching) land, no_internet_fallback can be
+        # set to True so the skill isn't unloaded just because the
+        # connection blips mid-story.
+        return RuntimeRequirements(
+            internet_before_load=True,
+            network_before_load=True,
+            requires_internet=True,
+            requires_network=True,
+            no_internet_fallback=False,
+            no_network_fallback=False,
+        )
+
     def initialize(self):
         self.is_reading = False
         # make sure settings are initialized
         self.settings['bookmark'] = 0
         self.settings['story'] = None
         self.index = {}
-        self.update_index()
+        try:
+            self.update_index()
+        except StoryFetchError as e:
+            # don't let a scraping failure prevent the skill from loading -
+            # intents will still register, we just won't have stories until
+            # the source sites are reachable again (see #8 for caching)
+            self.log.error(f"Could not build story index on startup: {e}")
 
     @intent_handler('Tales.intent')
     def handle_Tales(self, message: Message):
+        if not self.index:
+            self.speak_dialog('story_unavailable')
+            return
         if message.data.get("tale", "") is None:
             response = self.get_response('Tales', num_retries=1)
             if not response:
@@ -55,7 +88,12 @@ class Tales(OVOSSkill):
         self.speak_dialog('i_know_that', data={"story": result[0]})
         self.settings['story'] = result[0]
         time.sleep(3)
-        self.tell_story(self.index[result[0]], 0)
+        try:
+            self.tell_story(self.index[result[0]], 0)
+        except StoryFetchError as e:
+            self.log.error(f"Could not fetch story: {e}")
+            self.is_reading = False
+            self.speak_dialog('story_unavailable')
 
     @intent_handler('continue.intent')
     def handle_continue(self, message: Message):
@@ -64,7 +102,12 @@ class Tales(OVOSSkill):
         else:
             story = self.settings.get('story')
             self.speak_dialog('continue', data={"story": story})
-            self.tell_story(self.index.get(story), self.settings.get('bookmark') - 1)
+            try:
+                self.tell_story(self.index.get(story), self.settings.get('bookmark') - 1)
+            except StoryFetchError as e:
+                self.log.error(f"Could not fetch story: {e}")
+                self.is_reading = False
+                self.speak_dialog('story_unavailable')
 
     def tell_story(self, url, bookmark):
         self.is_reading = True
@@ -104,35 +147,43 @@ class Tales(OVOSSkill):
 
     def get_soup(self, url):
         try:
-            r = requests.get(url)
+            r = requests.get(url, timeout=10)
+            r.raise_for_status()
             r.encoding = r.apparent_encoding
-            soup = BeautifulSoup(r.text, "html.parser")
-            return soup
-        except Exception as SockException:
-            self.log.error(SockException)
+            return BeautifulSoup(r.text, "html.parser")
+        except requests.RequestException as e:
+            raise StoryFetchError(f"failed to fetch {url}: {e}") from e
 
     def get_story(self, url):
         soup = self.get_soup(url)
-        lines = [a.text.strip() for a in soup.find_all("div", {'itemprop': ['text']})][0]
-        return lines
+        elements = soup.find_all("div", {'itemprop': ['text']})
+        if not elements:
+            raise StoryFetchError(f"story text not found at {url}")
+        return elements[0].text.strip()
 
     def get_title(self, url):
         soup = self.get_soup(url)
-        title = [a.text.strip() for a in soup.find_all("h2", {'itemprop': ['name']})][0]
+        elements = soup.find_all("h2", {'itemprop': ['name']})
+        if not elements:
+            raise StoryFetchError(f"title not found at {url}")
         # genre = [a.text.strip() for a in soup.find_all("span", {'itemprop': ['genre']})][0]
         # title = title.replace(genre, '')
-        return title
+        return elements[0].text.strip()
 
     def get_subtitle(self, url):
         soup = self.get_soup(url)
-        subtitle = [a.text.strip() for a in soup.find_all("div", {'class': ['subtitle']})][0]
-        return subtitle
+        elements = soup.find_all("div", {'class': ['subtitle']})
+        if not elements:
+            raise StoryFetchError(f"subtitle not found at {url}")
+        return elements[0].text.strip()
 
     def get_index(self, url):
         soup = self.get_soup(url)
+        lists = soup.find_all("ul", {'class': ['list_link']})
+        if not lists:
+            raise StoryFetchError(f"story index not found at {url}")
         index = {}
-        link_list = soup.find_all("ul", {'class': ['list_link']})[0]
-        for link in link_list.find_all("a"):
+        for link in lists[0].find_all("a"):
             index.update({link.text: link.get("href")})
         return index
     
