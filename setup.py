@@ -48,7 +48,7 @@ def get_requirements(requirements_filename: str):
 
 
 def find_resource_files():
-    resource_base_dirs = ("locale", "intents", "dialog", "vocab", "regex", "ui", "sounds")
+    resource_base_dirs = ("locale", "regex", "ui", "sounds")
     package_data = ["*.json"]
     for res in resource_base_dirs:
         if path.isdir(path.join(BASE_PATH, res)):
@@ -64,13 +64,25 @@ with open("README.md", "r") as f:
 setup(
     name=PYPI_NAME,
     version=get_version(),
-    description="",
+    description="OVOS skill that tells fairy tales by Hans Christian Andersen and the Brothers Grimm",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url=URL,
+    project_urls={
+        "Source": URL,
+        "Bug Tracker": f"{URL}/issues",
+    },
     author="Andreas Lorensen",
     author_email="andlo@outlook.dk",
-    license="GPL 3.0",
+    license="GPL-3.0-or-later",
+    python_requires=">=3.9",
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: End Users/Desktop",
+        "Programming Language :: Python :: 3",
+        "Topic :: Multimedia :: Sound/Audio :: Speech",
+        "Topic :: Home Automation",
+    ],
     package_dir={SKILL_PKG: "."},
     package_data={SKILL_PKG: find_resource_files()},
     packages=[SKILL_PKG],

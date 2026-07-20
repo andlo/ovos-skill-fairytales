@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Contes de fées",
+  "description": "Raconte des contes de fées de H.C. Andersen et des Frères Grimm.",
+  "examples": [
+    "raconte-moi l'histoire de Cendrillon",
+    "lis-moi un conte de fées",
+    "continue l'histoire"
+  ],
+  "tags": ["divertissement", "histoires", "contesdefees", "andersen", "grimm"]
+}

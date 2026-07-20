@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Fiabe",
+  "description": "Racconta fiabe di H.C. Andersen e dei Fratelli Grimm.",
+  "examples": [
+    "raccontami la storia di Cenerentola",
+    "leggimi una fiaba",
+    "continua la storia"
+  ],
+  "tags": ["intrattenimento", "storie", "fiabe", "andersen", "grimm"]
+}

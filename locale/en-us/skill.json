@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Fairy Tales",
+  "description": "Tells fairy tales by Hans Christian Andersen and the Brothers Grimm.",
+  "examples": [
+    "tell me a story about Cinderella",
+    "read me a fairy tale",
+    "continue the story"
+  ],
+  "tags": ["entertainment", "stories", "fairytales", "andersen", "grimm"]
+}

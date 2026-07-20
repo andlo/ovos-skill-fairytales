@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Sprookjes",
+  "description": "Vertelt sprookjes van H.C. Andersen en de Gebroeders Grimm.",
+  "examples": [
+    "vertel me het verhaal van Assepoester",
+    "lees me een sprookje voor",
+    "ga verder met het verhaal"
+  ],
+  "tags": ["entertainment", "verhalen", "sprookjes", "andersen", "grimm"]
+}
