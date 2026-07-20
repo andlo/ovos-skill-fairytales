@@ -266,6 +266,8 @@ class Tales(OVOSSkill):
             self.index[entry_title] = {"url": url, "author": author_label}
     
     def update_index(self):
+        # andersenstories.com only offers these 7 languages - full list,
+        # confirmed against the site itself.
         url_andersen = {'da': 'https://www.andersenstories.com/da/andersen_fortaellinger/',
                         'en': 'https://www.andersenstories.com/en/andersen_fairy-tales/',
                         'de': 'https://www.andersenstories.com/de/andersen_maerchen/',
@@ -273,17 +275,25 @@ class Tales(OVOSSkill):
                         'fr': 'https://www.andersenstories.com/fr/andersen_contes/',
                         'it': 'https://www.andersenstories.com/it/andersen_fiabe/',
                         'nl': 'https://www.andersenstories.com/nl/andersen_sprookjes/'}
+        # grimmstories.com offers 20 languages; we only add ones that are
+        # also part of OVOS's actively-tracked language set (see #31), so
+        # this is currently the 7 Andersen languages + Portuguese
+        # (Grimm-only - no Andersen stories exist in Portuguese)
         url_grimm = {'da': 'https://www.grimmstories.com/da/grimm_eventyr/',
                      'en': 'https://www.grimmstories.com/en/grimm_fairy-tales/',
                      'de': 'https://www.grimmstories.com/de/grimm_maerchen/',
                      'es': 'https://www.grimmstories.com/es/grimm_cuentos/',
                      'fr': 'https://www.grimmstories.com/fr/grimm_contes/',
                      'it': 'https://www.grimmstories.com/it/grimm_fiabe/',
-                     'nl': 'https://www.grimmstories.com/nl/grimm_sprookjes/'}
+                     'nl': 'https://www.grimmstories.com/nl/grimm_sprookjes/',
+                     'pt': 'https://www.grimmstories.com/pt/grimm_contos/'}
+        # url_grimm is the broader set (superset of url_andersen), so it's
+        # the right one to check language support against
         lang = self.lang.split("-")[0]
-        if lang not in url_andersen:
+        if lang not in url_grimm:
             lang = "en"
         self.index = {}
-        self._merge_index(self.get_index(url_andersen[lang] + "list"), "Andersen")
+        if lang in url_andersen:
+            self._merge_index(self.get_index(url_andersen[lang] + "list"), "Andersen")
         self._merge_index(self.get_index(url_grimm[lang] + "list"), "Grimm")
          

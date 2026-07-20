@@ -17,7 +17,11 @@ Content is from andersenstories.com and grimmstories.com, so please go visit the
 https://www.andersenstories.com/
 https://www.grimmstories.com/
 
-This skill support stories in following languages: EN, DE, DA, ES, FR, IT. NL and uses the language your device is setup to use. 
+This skill supports stories in the following languages: EN, DA, DE, ES, FR, IT, NL, PT, and uses the language your device is set up to use.
+
+> **Note:** andersenstories.com only publishes in EN, DA, DE, ES, FR, IT, NL. Portuguese (PT) is Grimm-only - grimmstories.com has a Portuguese translation but andersenstories.com doesn't, so PT users will only hear Brothers Grimm stories, not H.C. Andersen ones.
+>
+> grimmstories.com actually offers several more languages (FI, HU, VI, TR, PL, RO, RU, UK, EL, ZH, JA, KO) that aren't included here yet, since they fall outside [OVOS's actively-tracked language set](https://openvoiceos.github.io/lang-support-tracker/). If you'd like your language added, please open an issue or a PR with translated `locale/<lang>/` files.
 
 _“If you want your children to be intelligent, read them fairy tales. If you want them to be more intelligent, read them more fairy tales.”
 Albert Einstein_

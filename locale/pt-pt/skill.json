@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Contos de fadas",
+  "description": "Conta contos dos Irmãos Grimm (apenas Grimm neste idioma - sem histórias de Andersen em português).",
+  "examples": [
+    "conta-me a história da Cinderela",
+    "lê-me um conto",
+    "continua a história"
+  ],
+  "tags": ["entretenimento", "historias", "contosdefadas", "grimm"]
+}
