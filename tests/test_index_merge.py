@@ -55,3 +55,21 @@ def test_update_index_uses_matching_language(skill, monkeypatch):
 
     assert any("andersen_fortaellinger" in url for url in requested_urls), requested_urls
     assert any("grimm_eventyr" in url for url in requested_urls), requested_urls
+
+
+def test_update_index_skips_andersen_for_grimm_only_language(skill, monkeypatch):
+    # Portuguese (#31): grimmstories.com has it, andersenstories.com
+    # doesn't - update_index() must not KeyError trying to look up a
+    # Portuguese Andersen URL that doesn't exist, and should only fetch
+    # from Grimm.
+    skill.lang = "pt-pt"
+    requested_urls = []
+
+    def fake_get_index(url):
+        requested_urls.append(url)
+        return {}
+
+    monkeypatch.setattr(skill, "get_index", fake_get_index)
+    skill.update_index()
+
+    assert requested_urls == ["https://www.grimmstories.com/pt/grimm_contos/list"]
