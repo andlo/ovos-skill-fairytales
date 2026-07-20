@@ -136,9 +136,8 @@ class Tales(OVOSSkill):
             if not response or response == 'no':
                 self.speak_dialog('no_story')
                 return
-        self.speak_dialog('i_know_that', data={"story": result[0]})
+        self.speak_dialog('i_know_that', data={"story": result[0]}, wait=True)
         self.settings['story'] = result[0]
-        time.sleep(3)
         try:
             self.tell_story(self.index[result[0]], 0)
         except StoryFetchError as e:
@@ -178,12 +177,10 @@ class Tales(OVOSSkill):
                     break
                 else:
                     self.speak_dialog(sentens, wait=True)
-                    time.sleep(1)
         if self.is_reading is True:
             self.is_reading = False
             self.settings['bookmark'] = 0
             self.settings['story'] = None
-            time.sleep(2)
             self.speak_dialog('from_Tales')
 
     def stop(self):
