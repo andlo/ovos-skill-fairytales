@@ -1,0 +1,16 @@
+{
+  "skill_id": "ovos-skill-fairytales.andlo",
+  "source": "https://github.com/andlo/ovos-skill-fairytales",
+  "package_name": "ovos-skill-fairytales",
+  "pip_spec": "ovos-skill-fairytales",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Cuentos de hadas",
+  "description": "Cuenta cuentos de hadas de H.C. Andersen y los Hermanos Grimm.",
+  "examples": [
+    "cuéntame el cuento de Cenicienta",
+    "léeme un cuento de hadas",
+    "continúa el cuento"
+  ],
+  "tags": ["entretenimiento", "cuentos", "cuentosdehadas", "andersen", "grimm"]
+}
