@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  workflow_call:  # allows publish.yml to reuse this as a pre-release gate
 
 jobs:
   test:
