@@ -12,5 +12,12 @@
     "lees me een sprookje voor",
     "ga verder met het verhaal"
   ],
-  "tags": ["entertainment", "verhalen", "sprookjes", "andersen", "grimm"]
+  "tags": [
+    "entertainment",
+    "verhalen",
+    "sprookjes",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }

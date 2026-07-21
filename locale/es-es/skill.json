@@ -12,5 +12,12 @@
     "léeme un cuento de hadas",
     "continúa el cuento"
   ],
-  "tags": ["entretenimiento", "cuentos", "cuentosdehadas", "andersen", "grimm"]
+  "tags": [
+    "entretenimiento",
+    "cuentos",
+    "cuentosdehadas",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }

@@ -12,5 +12,12 @@
     "lis-moi un conte de fées",
     "continue l'histoire"
   ],
-  "tags": ["divertissement", "histoires", "contesdefees", "andersen", "grimm"]
+  "tags": [
+    "divertissement",
+    "histoires",
+    "contesdefees",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }

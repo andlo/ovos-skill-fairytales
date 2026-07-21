@@ -12,5 +12,12 @@
     "læs et eventyr",
     "fortsæt historien"
   ],
-  "tags": ["underholdning", "historier", "eventyr", "andersen", "grimm"]
+  "tags": [
+    "underholdning",
+    "historier",
+    "eventyr",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }
