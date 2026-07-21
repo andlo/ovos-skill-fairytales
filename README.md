@@ -1,6 +1,18 @@
 # <img src='story-512.png' card_color='#40DBB0' width='50' height='50' style='vertical-align:bottom'/> Fairy Tales
 Stories and fairy tales by Hans Christian Andersen and the Brothers Grimm.
 
+> **⚠️ This skill is no longer under active development.** It works, and
+> will keep working, but new work is going into the
+> [ovos-skill-common-tales](https://github.com/andlo/ovos-skill-common-tales)
+> ecosystem instead - a proper orchestrator (similar in spirit to OCP for
+> media skills) plus separate provider skills
+> ([ovos-skill-andersen-tales](https://github.com/andlo/ovos-skill-andersen-tales),
+> ovos-skill-grimm-tales, and more to come). That approach avoids the
+> voice-command conflicts this skill runs into when installed alongside
+> other storyteller skills, and is where new languages, sources, and
+> features will land going forward. New installs should probably start
+> there instead.
+
 [![Tests](https://github.com/andlo/ovos-skill-fairytales/actions/workflows/test.yml/badge.svg)](https://github.com/andlo/ovos-skill-fairytales/actions/workflows/test.yml)
 [![PyPI version](https://img.shields.io/pypi/v/ovos-skill-fairytales.svg)](https://pypi.org/project/ovos-skill-fairytales/)
 
