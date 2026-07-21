@@ -12,5 +12,11 @@
     "lê-me um conto",
     "continua a história"
   ],
-  "tags": ["entretenimento", "historias", "contosdefadas", "grimm"]
+  "tags": [
+    "entretenimento",
+    "historias",
+    "contosdefadas",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }

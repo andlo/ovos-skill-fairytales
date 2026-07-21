@@ -12,5 +12,12 @@
     "lies mir ein Märchen vor",
     "erzähl weiter"
   ],
-  "tags": ["unterhaltung", "geschichten", "maerchen", "andersen", "grimm"]
+  "tags": [
+    "unterhaltung",
+    "geschichten",
+    "maerchen",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }

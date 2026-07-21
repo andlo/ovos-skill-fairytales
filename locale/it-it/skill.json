@@ -12,5 +12,12 @@
     "leggimi una fiaba",
     "continua la storia"
   ],
-  "tags": ["intrattenimento", "storie", "fiabe", "andersen", "grimm"]
+  "tags": [
+    "intrattenimento",
+    "storie",
+    "fiabe",
+    "andersen",
+    "grimm"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-fairytales/master/story-512.png"
 }
